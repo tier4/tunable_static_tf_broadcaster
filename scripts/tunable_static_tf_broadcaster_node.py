@@ -7,11 +7,12 @@ import tf2_ros
 import geometry_msgs.msg
 from dynamic_reconfigure.server import Server
 from tunable_static_tf_broadcaster.cfg import TfConfig
+from time import sleep
 
 class TunableStaticTFBroadcaster:
     def __init__(self):
         self.__pub_rate = rospy.get_param('~rate', 10) #Hz
-        self.__rate = rospy.Rate(self.__pub_rate)
+        #self.__rate = rospy.Rate(self.__pub_rate)
         self.__tf_broadcaster = tf2_ros.StaticTransformBroadcaster()
         self.__static_transformStamped = geometry_msgs.msg.TransformStamped()
         self.__static_transformStamped.header.frame_id = rospy.get_param('~header_frame', "world")
@@ -47,7 +48,9 @@ class TunableStaticTFBroadcaster:
         while not rospy.is_shutdown():
             self.__static_transformStamped.header.stamp = rospy.Time.now()
             self.__tf_broadcaster.sendTransform(self.__static_transformStamped)
-            self.__rate.sleep()
+            #self.__rate.sleep()
+            sleep(1/self.__pub_rate)
+
 
 def main():
     rospy.init_node('tunable_static_tf_broadcaster')
