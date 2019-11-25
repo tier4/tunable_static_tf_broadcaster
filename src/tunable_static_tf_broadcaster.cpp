@@ -52,12 +52,15 @@ TunableStaticTfBroadcaster::TunableStaticTfBroadcaster()
 void TunableStaticTfBroadcaster::run()
 {
     ros::Rate rate(publish_rate_);
+    ros::Duration duration(1.0 / publish_rate_);
+
     while(private_nh_.ok())
     {
         // Send transform
         if(is_valid_config_received_)
         {
-            transform_.header.stamp = ros::Time::now();
+            transform_.header.stamp = ros::Time::now() + duration;  // Set future time to allow
+                                                                    // slower sending w/o other node's timeout.
             broadcaster_.sendTransform(transform_);
         }
         else
