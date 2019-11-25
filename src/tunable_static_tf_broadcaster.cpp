@@ -92,7 +92,7 @@ void TunableStaticTfBroadcaster::dynamicReconfigureCallback(TfConfig &config, ui
             transform_.transform.rotation.w = quaternion.w();
             is_valid_config_received_ = true;
 
-            ROS_INFO("[tunable_static_tf_broadcaster] Setting parameters by static params... {x: %lf y: %lf z: %lf roll: %lf pitch: %lf yaw: %lf}",
+            ROS_DEBUG("[tunable_static_tf_broadcaster] Setting parameters by static params... {x: %lf y: %lf z: %lf roll: %lf pitch: %lf yaw: %lf}",
                 config.tf_x, config.tf_y, config.tf_z, config.tf_roll, config.tf_pitch, config.tf_yaw);
         }
         else
@@ -116,7 +116,7 @@ void TunableStaticTfBroadcaster::dynamicReconfigureCallback(TfConfig &config, ui
         transform_.transform.rotation.w = quaternion.w();
         is_valid_config_received_ = true;
 
-        ROS_INFO("[tunable_static_tf_broadcaster] Setting dynamic parameters... {x: %lf y: %lf z: %lf roll: %lf pitch: %lf yaw: %lf}",
+        ROS_DEBUG("[tunable_static_tf_broadcaster] Setting dynamic parameters... {x: %lf y: %lf z: %lf roll: %lf pitch: %lf yaw: %lf}",
             config.tf_x, config.tf_y, config.tf_z, config.tf_roll, config.tf_pitch, config.tf_yaw);
     }
 }
