@@ -27,10 +27,26 @@ TunableStaticTfBroadcaster::TunableStaticTfBroadcaster()
     ROS_DEBUG("[tunable_static_tf_broadcaster] Setting parameters... {rate: %d, header_frame: %s, child_frame: %s}",
         publish_rate_, transform_.header.frame_id.c_str(), transform_.child_frame_id.c_str());
 
+    // Get if static param is set
+    if( private_nh_.hasParam("tf_x")
+     || private_nh_.hasParam("tf_y")
+     || private_nh_.hasParam("tf_z")
+     || private_nh_.hasParam("tf_roll")
+     || private_nh_.hasParam("tf_pitch")
+     || private_nh_.hasParam("tf_yaw") )
+    {
+        has_initial_static_params_ = true;
+    }
+    else
+    {
+        has_initial_static_params_ = false;
+    }
+
     // Setup dynamic reconfigure
+    dynamic_reconfigure_server_ = std::make_shared<dynamic_reconfigure::Server<TfConfig> >();
     dynamic_reconfigure::Server<TfConfig>::CallbackType f;
     f = boost::bind<void>(&TunableStaticTfBroadcaster::dynamicReconfigureCallback, this, _1, _2);
-    dynamic_reconfigure_server_.setCallback(f);
+    dynamic_reconfigure_server_->setCallback(f);
 }
 
 void TunableStaticTfBroadcaster::run()
@@ -39,8 +55,16 @@ void TunableStaticTfBroadcaster::run()
     while(private_nh_.ok())
     {
         // Send transform
-        transform_.header.stamp = ros::Time::now();
-        broadcaster_.sendTransform(transform_);
+        if(is_valid_config_received_)
+        {
+            transform_.header.stamp = ros::Time::now();
+            broadcaster_.sendTransform(transform_);
+        }
+        else
+        {
+            ROS_WARN_THROTTLE(3.0, "[tunable_static_tf_broadcaster] Configuration not received. waiting...");
+        }
+        
         ros::spinOnce();
         rate.sleep();
     }
@@ -48,18 +72,50 @@ void TunableStaticTfBroadcaster::run()
 
 void TunableStaticTfBroadcaster::dynamicReconfigureCallback(TfConfig &config, uint32_t level)
 {
-    transform_.transform.translation.x = config.tf_x;
-    transform_.transform.translation.y = config.tf_y;
-    transform_.transform.translation.z = config.tf_z;
-    tf2::Quaternion quaternion;
-    quaternion.setRPY(config.tf_roll, config.tf_pitch, config.tf_yaw);
-    transform_.transform.rotation.x = quaternion.x();
-    transform_.transform.rotation.y = quaternion.y();
-    transform_.transform.rotation.z = quaternion.z();
-    transform_.transform.rotation.w = quaternion.w();
+    if(is_first_config_callback_)
+    {
+        // If it was first calling, there are cases that it has static param value or not.
+        if(has_initial_static_params_)
+        {
+            // Get static param value
+            transform_.transform.translation.x = config.tf_x;
+            transform_.transform.translation.y = config.tf_y;
+            transform_.transform.translation.z = config.tf_z;
+            tf2::Quaternion quaternion;
+            quaternion.setRPY(config.tf_roll, config.tf_pitch, config.tf_yaw);
+            transform_.transform.rotation.x = quaternion.x();
+            transform_.transform.rotation.y = quaternion.y();
+            transform_.transform.rotation.z = quaternion.z();
+            transform_.transform.rotation.w = quaternion.w();
+            is_valid_config_received_ = true;
 
-    ROS_DEBUG("[tunable_static_tf_broadcaster] Setting dynamic parameters... {x: %lf y: %lf z: %lf roll: %lf pitch: %lf yaw: %lf}",
-        config.tf_x, config.tf_y, config.tf_z, config.tf_roll, config.tf_pitch, config.tf_yaw);
+            ROS_INFO("[tunable_static_tf_broadcaster] Setting parameters by static params... {x: %lf y: %lf z: %lf roll: %lf pitch: %lf yaw: %lf}",
+                config.tf_x, config.tf_y, config.tf_z, config.tf_roll, config.tf_pitch, config.tf_yaw);
+        }
+        else
+        {
+            // Static param is not set. Wait for dynamic configuration.
+            is_valid_config_received_ = false;
+        }
+        is_first_config_callback_ = false;
+    }
+    else
+    {
+        // Not first calling
+        transform_.transform.translation.x = config.tf_x;
+        transform_.transform.translation.y = config.tf_y;
+        transform_.transform.translation.z = config.tf_z;
+        tf2::Quaternion quaternion;
+        quaternion.setRPY(config.tf_roll, config.tf_pitch, config.tf_yaw);
+        transform_.transform.rotation.x = quaternion.x();
+        transform_.transform.rotation.y = quaternion.y();
+        transform_.transform.rotation.z = quaternion.z();
+        transform_.transform.rotation.w = quaternion.w();
+        is_valid_config_received_ = true;
+
+        ROS_INFO("[tunable_static_tf_broadcaster] Setting dynamic parameters... {x: %lf y: %lf z: %lf roll: %lf pitch: %lf yaw: %lf}",
+            config.tf_x, config.tf_y, config.tf_z, config.tf_roll, config.tf_pitch, config.tf_yaw);
+    }
 }
 
 }
