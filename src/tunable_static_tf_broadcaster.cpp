@@ -49,6 +49,20 @@ TunableStaticTfBroadcaster::TunableStaticTfBroadcaster()
     dynamic_reconfigure_server_->setCallback(f);
 }
 
+TunableStaticTfBroadcaster::~TunableStaticTfBroadcaster()
+{
+    // Delete params for another run
+    if(!is_valid_config_received_)
+    {
+        private_nh_.deleteParam("tf_x");
+        private_nh_.deleteParam("tf_y");
+        private_nh_.deleteParam("tf_z");
+        private_nh_.deleteParam("tf_roll");
+        private_nh_.deleteParam("tf_pitch");
+        private_nh_.deleteParam("tf_yaw");
+    }
+}
+
 void TunableStaticTfBroadcaster::run()
 {
     ros::Rate rate(publish_rate_);

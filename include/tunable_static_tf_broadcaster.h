@@ -13,6 +13,7 @@ namespace tunable_static_tf_broadcaster
     {
     public:
         TunableStaticTfBroadcaster();
+        ~TunableStaticTfBroadcaster();
         void run();
 
     private:
