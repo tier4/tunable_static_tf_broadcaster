@@ -5,6 +5,7 @@
     <param name="rate" value="10.0" type="double" /> <!-- tfの更新レート[Hz]-->
     <param name="header_frame" value="world" type="string" /> <!-- tfのヘッダフレームID -->
     <param name="child_frame" value="base_link" type="string" /> <!-- tfの子フレームID-->
+    <param name="yaml" value="$(find tunable_static_tf_broadcaster)/params/base_link.yaml" type="string" /> <!-- 初期化用yaml -->
   </node>
 
   <!-- arm -->
@@ -12,6 +13,7 @@
     <param name="rate" value="10.0" type="double" /> <!-- tfの更新レート[Hz]-->
     <param name="header_frame" value="base_link" type="string" /> <!-- tfのヘッダフレームID -->
     <param name="child_frame" value="arm" type="string" /> <!-- tfの子フレームID-->
+    <param name="yaml" value="$(find tunable_static_tf_broadcaster)/params/arm.yaml" type="string" /> <!-- 初期化用yaml -->
   </node>
 
   <!-- 設定用rqt_reconfigure -->
