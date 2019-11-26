@@ -17,6 +17,7 @@ class TunableStaticTFBroadcaster:
         self.__pub_rate = rospy.get_param('~rate', 10) #Hz
         self.__tf_broadcaster = tf2_ros.StaticTransformBroadcaster()
         self.__static_transformStamped = geometry_msgs.msg.TransformStamped()
+        self.__srv = Server(TfConfig, self.__reconfigure_callback)
         self.__static_transformStamped.header.frame_id = rospy.get_param('~header_frame', "world")
         self.__static_transformStamped.child_frame_id = rospy.get_param('~child_frame', "base_link")
         self.__yaml_path = rospy.get_param('~yaml', "")
@@ -33,7 +34,6 @@ class TunableStaticTFBroadcaster:
             init_config.tf_pitch = 0.0
             init_config.tf_yaw = 0.0
             self.__set_tf(init_config)
-        self.__srv = Server(TfConfig, self.__reconfigure_callback)
 
     def __reconfigure_callback(self, config, level):
         self.__set_tf(config)
@@ -57,7 +57,6 @@ class TunableStaticTFBroadcaster:
             self.__static_transformStamped.header.stamp = rospy.Time.now()
             self.__tf_broadcaster.sendTransform(self.__static_transformStamped)
             sleep(1/self.__pub_rate)
-
 
 def main():
     rospy.init_node('tunable_static_tf_broadcaster')
