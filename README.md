@@ -24,6 +24,7 @@ tunable_static_tf_broadcaster_nodeを複数立ち上げることでフレーム�
     <param name="rate" value="10.0" type="double" /> <!-- tfの更新レート[Hz]-->
     <param name="header_frame" value="親フレームのID" type="string" /> <!-- tfのヘッダフレームID -->
     <param name="child_frame" value="子のフレームID" type="string" /> <!-- tfの子フレームID-->
+    <param name="yaml" value="$(find tunable_static_tf_broadcaster)/params/初期化に使うyaml" type="string" /> <!-- 初期化用yaml -->
   </node>
 ```
 
