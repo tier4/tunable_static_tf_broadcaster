@@ -45,7 +45,7 @@ TunableStaticTfBroadcaster::TunableStaticTfBroadcaster()
     // Setup dynamic reconfigure
     dynamic_reconfigure_server_ = std::make_shared<dynamic_reconfigure::Server<TfConfig> >();
     dynamic_reconfigure::Server<TfConfig>::CallbackType f;
-    f = boost::bind<void>(&TunableStaticTfBroadcaster::dynamicReconfigureCallback, this, _1, _2);
+    f = boost::bind(&TunableStaticTfBroadcaster::dynamicReconfigureCallback, this, _1, _2);
     dynamic_reconfigure_server_->setCallback(f);
 }
 
