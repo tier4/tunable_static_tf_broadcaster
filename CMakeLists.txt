@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   tf2
   tf2_ros
+  roslint
 )
 
 ## System dependencies are found with CMake's conventions
@@ -135,6 +136,11 @@ include_directories(
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(
   ${PROJECT_NAME}_node
+  src/tunable_static_tf_broadcaster_node.cpp
+  src/tunable_static_tf_broadcaster.cpp
+)
+
+roslint_cpp(
   src/tunable_static_tf_broadcaster_node.cpp
   src/tunable_static_tf_broadcaster.cpp
 )
