@@ -22,22 +22,30 @@ class TunableStaticTFBroadcaster:
         self.__static_transformStamped.child_frame_id = rospy.get_param('~child_frame', "base_link")
         self.__yaml_path = rospy.get_param('~yaml', "")
         if self.__yaml_path != "":
-            yaml_file = open(self.__yaml_path, "r+")
-            yaml_data = yaml.load(yaml_file)
-            self.__set_tf(yaml_data)
+            try:
+                yaml_file = open(self.__yaml_path, "r+")
+                yaml_data = yaml.load(yaml_file)
+                self.__set_tf(yaml_data)
+            except IOError:
+                rospy.logwarn('file not found in' + self.__yaml_path)
+                rospy.logwarn("tf parameters are set 0.0")
+                self.__set_zero()
         else:
-            init_config = TfType()
-            init_config.tf_x = 0.0
-            init_config.tf_y = 0.0
-            init_config.tf_z = 0.0
-            init_config.tf_roll = 0.0
-            init_config.tf_pitch = 0.0
-            init_config.tf_yaw = 0.0
-            self.__set_tf(init_config)
+            self.__set_zero()
 
     def __reconfigure_callback(self, config, level):
         self.__set_tf(config)
         return config
+
+    def __set_zero(self):
+        init_config = TfType()
+        init_config.tf_x = 0.0
+        init_config.tf_y = 0.0
+        init_config.tf_z = 0.0
+        init_config.tf_roll = 0.0
+        init_config.tf_pitch = 0.0
+        init_config.tf_yaw = 0.0
+        self.__set_tf(init_config)
 
     def __set_tf(self, config):
         self.__static_transformStamped.transform.translation.x = config.tf_x
