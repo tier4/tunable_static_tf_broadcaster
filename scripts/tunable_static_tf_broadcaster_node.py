@@ -22,6 +22,7 @@ import tf
 import tf2_ros
 import geometry_msgs.msg
 from dynamic_reconfigure.server import Server
+from dynamic_reconfigure.client import Client
 from tunable_static_tf_broadcaster.cfg import TfConfig
 from time import sleep
 import yaml
@@ -41,6 +42,8 @@ class TunableStaticTFBroadcaster:
             try:
                 yaml_file = open(self.__yaml_path, "r+")
                 yaml_data = yaml.load(yaml_file)
+                client = Client(rospy.get_name())
+                client.update_configuration(yaml_data)
                 self.__set_tf(yaml_data)
             except IOError:
                 rospy.logwarn('file not found in' + self.__yaml_path)
