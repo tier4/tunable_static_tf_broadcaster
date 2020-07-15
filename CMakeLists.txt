@@ -160,6 +160,10 @@ target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
 )
 
+catkin_install_python(PROGRAMS scripts/tunable_static_tf_broadcaster_node.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
 install(
   TARGETS ${PROJECT_NAME}_node 
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
